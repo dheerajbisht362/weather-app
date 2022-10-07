@@ -4,9 +4,6 @@ import LineGraph from "./components/line-graph";
 import WeekTemperature from "./components/week-temperature";
 
 function App() {
-  const [input, setInput] = useState("");
-  const [cities, setCities] = useState([]);
-  const [citiesTemp, setCitiesTemp] = useState([])
   const [location, setLocation] = useState({
     lat: 28.6738274,
     lon: 77.1642584, // default location
@@ -22,38 +19,6 @@ function App() {
     humidity: 70,
   });
 
-  function handleInput(e) {
-    apiCallCity()
-    setInput(e.target.value);
-  }
-
-  function apiCallCity() {
-    if (input) {
-      fetch(
-        `https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=5&appid=e4c70ce6a6821649a416cb9521d5f4f8&limit=5`
-      )
-        .then((res) => res.json())
-        .then((res) => {
-          setCities(res)
-          getTemeratureCities(res);
-        });
-    }
-  }
-
-  async function getTemeratureCities(cities) {
-   const temp =  []
-   cities.map((el) => {
-      fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${el.lat}&lon=${el.lon}&units=metric&appid=e4c70ce6a6821649a416cb9521d5f4f8`
-      )
-        .then((res) => res.json())
-        .then((res) => {
-         temp.push(res?.main?.temp)
-        });
-    });
-    setCitiesTemp([...temp]);
-  }
-
   function getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(setPositionData);
@@ -67,12 +32,10 @@ function App() {
     });
   }
 
-  function handleCityTemp(lat, lon, city) {
-    setInput(city);
-    setCities([]);
+  function setLocationCorrd(lat, lon) {
     setLocation({
-      lat: lat,
-      lon: lon,
+      lat,
+      lon,
     });
   }
 
@@ -105,13 +68,7 @@ function App() {
 
   return (
     <div className="App container-md mt-4 d-flex flex-column justify-content-center">
-      <InputHead
-        input={input}
-        handleInput={handleInput}
-        cities={[...cities]}
-        handleCityTemp={handleCityTemp}
-        citiesTemp = {citiesTemp}
-      />
+      <InputHead setLocationCorrd={setLocationCorrd} />
       <WeekTemperature />
       <LineGraph currLocParameter={currLocParameter} />
     </div>

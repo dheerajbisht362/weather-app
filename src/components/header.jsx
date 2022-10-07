@@ -1,4 +1,39 @@
-function InputHead({ input, handleInput, cities, handleCityTemp, citiesTemp }) {
+import { useState } from "react";
+
+function InputHead({ setLocationCorrd }) {
+  const [input, setInput] = useState("");
+  // const [cities, setCities] = useState([]);
+  const [citiesTemp, setCitiesTemp] = useState([]);
+
+  function handleInput(e) {
+    setInput(e.target.value);
+    apiCallCity();
+  }
+
+  function apiCallCity() {
+    if (input) {
+      fetch(
+        `https://api.openweathermap.org/geo/1.0/direct?q=${input}&limit=5&appid=e4c70ce6a6821649a416cb9521d5f4f8&limit=5`
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          // setCities(res);
+          getTemeratureCities(res);
+        });
+    }
+  }
+
+  async function getTemeratureCities(cities) {
+    setCitiesTemp([...cities]);
+  }
+
+  function handleCityTemp(lat, lon, city) {
+    setInput(city);
+    setCitiesTemp([]);
+    setLocationCorrd(lat, lon);
+  }
+  const picture = ["/sunny.png", "/sun.png", "/clouds.png"];
+
   return (
     <>
       <div className="b-3 d-flex justify-content-between border p-1 px-4 rounded shadow p-3 mb-1 bg-body rounded ">
@@ -16,25 +51,28 @@ function InputHead({ input, handleInput, cities, handleCityTemp, citiesTemp }) {
           style={{ background: "white", position: "absolute", opacity: "1.0" }}
           className="border rounded shadow "
         >
-          {cities &&
-            cities.length > 0 &&
-            cities.map((el, i) => (
+          {citiesTemp &&
+            citiesTemp.length > 0 &&
+            citiesTemp.map((el, i) => (
               <div
                 key={i}
                 className="d-flex justify-content-between"
+                style={{ boxShadow: "2px 2px #c5c5c5" }}
                 onClick={() => handleCityTemp(el.lat, el.lon, el.name)}
               >
                 <div style={{ width: "500px" }} className="m-1 mx-5 fs-3">
                   {el.name}
                 </div>
+                <p style={{ float: "right", fontSize: "24px", margin: "2px" }}>
+                  {parseInt(Math.random() * 10 + 25)}
+                  <img
+                    alt="pic"
+                    width={40}
+                    src={picture[parseInt(Math.random() * 3)]}
+                  />
+                </p>
               </div>
             ))}
-            {console.log(citiesTemp)}
-          {citiesTemp &&
-            citiesTemp.length > 0 &&
-            citiesTemp.map((el) => {
-              <p style={{ float: "right" }}>{el}</p>;
-            })}
         </div>
       </div>
     </>
